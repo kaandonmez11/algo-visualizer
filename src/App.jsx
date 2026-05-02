@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Play, Square, Volume2, VolumeX, Shuffle, ArrowDownUp, ChevronDown } from 'lucide-react'
+import { Play, Square, Volume2, VolumeX, Shuffle, ArrowDownUp, ChevronDown, FlaskConical } from 'lucide-react'
+import useStore from './store/useStore'
 
 const ALGORITHMS = [
   'Bubble Sort',
@@ -138,6 +139,41 @@ export default function App() {
   const [isRunning,    setIsRunning]    = useState(false)
   const [isMuted,      setIsMuted]      = useState(false)
 
+  const generateArray = useStore(s => s.generateArray)
+
+  function handleTestWorker() {
+    const arr = generateArray(arraySize, arrayType, customInput)
+    console.group('%c[Test Worker] Başlatıldı', 'color:#47b8ad;font-weight:bold')
+    console.log('Dizi boyutu:', arr.length, '| Gecikme:', delay, 'ms')
+    console.log('İlk 10 eleman:', arr.slice(0, 10))
+
+    const worker = new Worker(
+      new URL('./workers/sortWorker.js', import.meta.url)
+    )
+
+    worker.postMessage({ array: arr, delay: delay })
+
+    let stepCount = 0
+    worker.onmessage = (e) => {
+      const { type, comparisons, swaps, cpuTime, array: sorted } = e.data
+      if (type === 'step') {
+        stepCount++
+        if (stepCount <= 5) {
+          console.log(`Adım ${stepCount}:`, e.data.type, '— indeksler:', e.data.indices)
+        }
+        if (stepCount === 6) console.log('... (sonraki adımlar gizlendi)')
+      }
+      if (type === 'done') {
+        console.log('%c✓ Sıralama tamamlandı', 'color:#f8c23c;font-weight:bold')
+        console.log('Saf CPU Süresi:', cpuTime, 'ms')
+        console.log('Karşılaştırma:', comparisons, '| Takas:', swaps)
+        console.log('Son 10 eleman:', sorted.slice(-10))
+        console.groupEnd()
+        worker.terminate()
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col h-screen bg-[#0a0a0f] text-slate-200">
 
@@ -215,6 +251,18 @@ export default function App() {
 
         {/* Action Buttons */}
         <div className="flex items-end gap-2 ml-auto">
+          <button
+            onClick={handleTestWorker}
+            title="Test Worker (konsola bak)"
+            className="
+              h-9 flex items-center gap-2 px-4 rounded-lg border border-[#47b8ad]/30
+              bg-[#47b8ad]/10 text-[#47b8ad] text-sm font-medium
+              hover:bg-[#47b8ad]/20 transition-all duration-200 active:scale-95
+            "
+          >
+            <FlaskConical size={14} />
+            Test Worker
+          </button>
           <button
             onClick={() => setIsMuted(m => !m)}
             title={isMuted ? 'Sesi Aç' : 'Sesi Kapat'}

@@ -1,13 +1,23 @@
 import { useRef, useState, useImperativeHandle, forwardRef, useEffect } from 'react'
 import CanvasRenderer from './CanvasRenderer'
+import { audioManager } from '../utils/audioManager'
 
 const WIKI_URLS = {
-  'Bubble Sort':    'https://en.wikipedia.org/wiki/Bubble_sort',
-  'Selection Sort': 'https://en.wikipedia.org/wiki/Selection_sort',
-  'Insertion Sort': 'https://en.wikipedia.org/wiki/Insertion_sort',
-  'Merge Sort':     'https://en.wikipedia.org/wiki/Merge_sort',
-  'Quick Sort':     'https://en.wikipedia.org/wiki/Quicksort',
-  'Heap Sort':      'https://en.wikipedia.org/wiki/Heapsort',
+  'Bubble Sort':          'https://en.wikipedia.org/wiki/Bubble_sort',
+  'Selection Sort':       'https://en.wikipedia.org/wiki/Selection_sort',
+  'Insertion Sort':       'https://en.wikipedia.org/wiki/Insertion_sort',
+  'Merge Sort':           'https://en.wikipedia.org/wiki/Merge_sort',
+  'Quick Sort':           'https://en.wikipedia.org/wiki/Quicksort',
+  'Heap Sort':            'https://en.wikipedia.org/wiki/Heapsort',
+  'Radix Sort':           'https://en.wikipedia.org/wiki/Radix_sort',
+  'Shell Sort':           'https://en.wikipedia.org/wiki/Shellsort',
+  'Cocktail Shaker Sort': 'https://en.wikipedia.org/wiki/Cocktail_shaker_sort',
+  'Gnome Sort':           'https://en.wikipedia.org/wiki/Gnome_sort',
+  'Bitonic Sort':         'https://en.wikipedia.org/wiki/Bitonic_sort',
+  'Pancake Sort':         'https://en.wikipedia.org/wiki/Pancake_sorting',
+  'Comb Sort':            'https://en.wikipedia.org/wiki/Comb_sort',
+  'Odd-Even Sort':        'https://en.wikipedia.org/wiki/Odd%E2%80%93even_sort',
+  'Bogo Sort':            'https://en.wikipedia.org/wiki/Bogosort',
 }
 
 const RacePanel = forwardRef(function RacePanel({ algorithm, initialArray, delay, onFinished }, ref) {
@@ -48,11 +58,13 @@ const RacePanel = forwardRef(function RacePanel({ algorithm, initialArray, delay
         case 'compare':
           highlightRef.current = { ...highlightRef.current, comparing: msg.indices, swapping: [] }
           lastStatsRef.current = { cmp: msg.cmp, acc: msg.acc }
+          audioManager.playNote(arrayRef.current[msg.indices[0]], propsRef.current.initialArray.length)
           break
         case 'swap': {
           arrayRef.current = msg.array
           highlightRef.current = { ...highlightRef.current, swapping: msg.indices, comparing: [] }
           lastStatsRef.current = { cmp: msg.cmp, acc: msg.acc }
+          audioManager.playNote(msg.array[msg.indices[0]], propsRef.current.initialArray.length)
           const animTime = +((performance.now() - startTimeRef.current) / 1000).toFixed(2)
           historyRef.current.push({
             array: msg.array.slice(), swapping: [...msg.indices],
@@ -111,6 +123,7 @@ const RacePanel = forwardRef(function RacePanel({ algorithm, initialArray, delay
     historyRef.current.push({ array: [...initialArray], swapping: [], sorted: [], cmp: 0, acc: 0, animTime: 0 })
     lastStatsRef.current     = { cmp: 0, acc: 0 }
     startTimeRef.current     = performance.now()
+    audioManager.resume()
     setStats(null)
     setStatus('running')
 
@@ -150,6 +163,7 @@ const RacePanel = forwardRef(function RacePanel({ algorithm, initialArray, delay
       currentSortedRef.current = new Set(snap.sorted)
       lastStatsRef.current     = { cmp: snap.cmp, acc: snap.acc }
       startTimeRef.current     = performance.now() - (snap.animTime ?? 0) * 1000
+      audioManager.resume()
 
       // Restore visual state from snapshot
       arrayRef.current = snap.array.slice()

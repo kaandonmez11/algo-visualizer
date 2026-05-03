@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Play, Square, RotateCcw, Volume2, VolumeX, Shuffle, Swords, GitCommitHorizontal } from 'lucide-react'
 import CanvasRenderer from './components/CanvasRenderer'
 import RaceGrid from './components/RaceGrid'
 import AlgoDropdown, { ALGORITHMS } from './components/AlgoDropdown'
+import { audioManager } from './utils/audioManager'
 
 // ── Array generation ──────────────────────────────────────────────────────────
 function makeRandom(n)   { return Array.from({ length: n }, () => Math.floor(Math.random() * n) + 1) }
@@ -28,12 +29,21 @@ function buildArray(size, type, customInput) {
 }
 
 const WIKI_URLS = {
-  'Bubble Sort':    'https://en.wikipedia.org/wiki/Bubble_sort',
-  'Selection Sort': 'https://en.wikipedia.org/wiki/Selection_sort',
-  'Insertion Sort': 'https://en.wikipedia.org/wiki/Insertion_sort',
-  'Merge Sort':     'https://en.wikipedia.org/wiki/Merge_sort',
-  'Quick Sort':     'https://en.wikipedia.org/wiki/Quicksort',
-  'Heap Sort':      'https://en.wikipedia.org/wiki/Heapsort',
+  'Bubble Sort':          'https://en.wikipedia.org/wiki/Bubble_sort',
+  'Selection Sort':       'https://en.wikipedia.org/wiki/Selection_sort',
+  'Insertion Sort':       'https://en.wikipedia.org/wiki/Insertion_sort',
+  'Merge Sort':           'https://en.wikipedia.org/wiki/Merge_sort',
+  'Quick Sort':           'https://en.wikipedia.org/wiki/Quicksort',
+  'Heap Sort':            'https://en.wikipedia.org/wiki/Heapsort',
+  'Radix Sort':           'https://en.wikipedia.org/wiki/Radix_sort',
+  'Shell Sort':           'https://en.wikipedia.org/wiki/Shellsort',
+  'Cocktail Shaker Sort': 'https://en.wikipedia.org/wiki/Cocktail_shaker_sort',
+  'Gnome Sort':           'https://en.wikipedia.org/wiki/Gnome_sort',
+  'Bitonic Sort':         'https://en.wikipedia.org/wiki/Bitonic_sort',
+  'Pancake Sort':         'https://en.wikipedia.org/wiki/Pancake_sorting',
+  'Comb Sort':            'https://en.wikipedia.org/wiki/Comb_sort',
+  'Odd-Even Sort':        'https://en.wikipedia.org/wiki/Odd%E2%80%93even_sort',
+  'Bogo Sort':            'https://en.wikipedia.org/wiki/Bogosort',
 }
 
 const ARRAY_TYPES = [
@@ -96,11 +106,17 @@ export default function App() {
   const [raceArray,  setRaceArray]  = useState(() => makeRandom(100))
   const [slideClass, setSlideClass] = useState('')
 
+  const raceGridRef = useRef(null)
+
   function switchMode(newMode) {
     if (newMode === mode) return
+    if (mode === 'single' && sortStatus === 'running') handlePause()
+    if (mode === 'race') raceGridRef.current?.pause()
     setSlideClass(newMode === 'race' ? 'slide-from-right' : 'slide-from-left')
     setMode(newMode)
   }
+
+  useEffect(() => { audioManager.setMuted(isMuted) }, [isMuted])
 
   const arrayRef         = useRef([])
   const highlightRef     = useRef({ comparing: [], swapping: [], sorted: new Set() })
@@ -188,10 +204,12 @@ export default function App() {
       if (msg.type === 'compare') {
         highlightRef.current = { ...highlightRef.current, comparing: msg.indices, swapping: [] }
         lastStatsRef.current = { cmp: msg.cmp, acc: msg.acc }
+        audioManager.playNote(arrayRef.current[msg.indices[0]], initialArrayRef.current.length)
       } else if (msg.type === 'swap') {
         arrayRef.current = msg.array
         highlightRef.current = { ...highlightRef.current, swapping: msg.indices, comparing: [] }
         lastStatsRef.current = { cmp: msg.cmp, acc: msg.acc }
+        audioManager.playNote(msg.array[msg.indices[0]], initialArrayRef.current.length)
         const animTime = +((performance.now() - animStartRef.current) / 1000).toFixed(2)
         singleHistoryRef.current.push({
           array: msg.array.slice(), swapping: [...msg.indices],
@@ -246,6 +264,7 @@ export default function App() {
     singleHistoryRef.current.push({ array: arr.slice(), swapping: [], sorted: [], cmp: 0, acc: 0, animTime: 0 })
     animStartRef.current     = performance.now()
     resetSignalRef.current  += 1
+    audioManager.resume()
     setStats(null)
     setTimelineMax(1)
     setTimelinePos(1)
@@ -426,13 +445,11 @@ export default function App() {
 
         {/* Action Buttons */}
         <div className="flex items-end gap-2 ml-auto">
-          {mode === 'single' && (
-            <button onClick={() => setIsMuted(m => !m)} title={isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
-              className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/10 bg-white/5
-                text-slate-400 hover:bg-white/10 hover:text-[#47b8ad] transition-all duration-200">
-              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            </button>
-          )}
+          <button onClick={() => setIsMuted(m => !m)} title={isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
+            className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/10 bg-white/5
+              text-slate-400 hover:bg-white/10 hover:text-[#47b8ad] transition-all duration-200">
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
 
           <button onClick={handleGenerate}
             className="h-9 flex items-center gap-2 px-4 rounded-lg border border-white/10 bg-white/5
@@ -546,7 +563,7 @@ export default function App() {
 
         {/* ── Race mode — always mounted, hidden when inactive ── */}
         <div className={`flex-1 min-h-0 flex flex-col ${mode !== 'race' ? 'hidden' : slideClass}`}>
-          <RaceGrid initialArray={raceArray} delay={delay} />
+          <RaceGrid ref={raceGridRef} initialArray={raceArray} delay={delay} />
         </div>
       </main>
 

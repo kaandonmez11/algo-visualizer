@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react'
 import { Play, Square, RotateCcw, GitCommitHorizontal } from 'lucide-react'
 import RacePanel from './RacePanel'
 import AlgoDropdown, { ALGORITHMS } from './AlgoDropdown'
@@ -13,7 +13,7 @@ const GRID_CLS = {
   4: 'grid-cols-2 grid-rows-2',
 }
 
-export default function RaceGrid({ initialArray, delay }) {
+const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
   const [count,       setCount]       = useState(2)
   const [algos,       setAlgos]       = useState(DEFAULT_ALGOS)
   const [status,      setStatus]      = useState('idle')   // idle | running | paused | done
@@ -124,6 +124,10 @@ export default function RaceGrid({ initialArray, delay }) {
     setTimelinePos(step)
     panelRefs.current.slice(0, count).forEach(r => r?.scrubTo(step))
   }
+
+  useImperativeHandle(ref, () => ({
+    pause() { if (status === 'running') pauseRace() },
+  }))
 
   const isRunning = status === 'running'
   const isPaused  = status === 'paused'
@@ -242,4 +246,6 @@ export default function RaceGrid({ initialArray, delay }) {
       </div>
     </div>
   )
-}
+})
+
+export default RaceGrid

@@ -9,6 +9,15 @@ export const ALGORITHMS = [
   'Merge Sort',
   'Quick Sort',
   'Heap Sort',
+  'Radix Sort',
+  'Shell Sort',
+  'Cocktail Shaker Sort',
+  'Gnome Sort',
+  'Bitonic Sort',
+  'Pancake Sort',
+  'Comb Sort',
+  'Odd-Even Sort',
+  'Bogo Sort',
 ]
 
 export default function AlgoDropdown({ value, onChange, disabled = false, compact = false }) {

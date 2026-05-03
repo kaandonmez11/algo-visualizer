@@ -7,7 +7,9 @@
       "Bash(findstr \"LISTEN\")",
       "Bash(findstr \"518\")",
       "Bash(findstr \":51\")",
-      "Bash(findstr \"LISTENING\")"
+      "Bash(findstr \"LISTENING\")",
+      "Bash(not exist *)",
+      "PowerShell(New-Item *)"
     ]
   }
 }

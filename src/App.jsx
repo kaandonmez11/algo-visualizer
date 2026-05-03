@@ -363,7 +363,7 @@ export default function App() {
 
       {/* Header */}
       <header className="flex items-center gap-3 px-6 py-3 border-b border-white/10 bg-white/5 backdrop-blur-sm">
-        <img src="/logo.svg" alt="KD Logo" width={30} height={30} />
+        <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="KD Logo" width={30} height={30} />
         <h1 className="text-lg font-semibold tracking-tight text-white">
           Algo <span className="text-[#47b8ad]">Visualizer</span>
         </h1>

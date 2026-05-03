@@ -91,6 +91,16 @@
   .timeline-slider:disabled::-webkit-slider-thumb { cursor: default; }
   .timeline-slider:disabled::-moz-range-thumb     { cursor: default; }
 
+  /* ── Dropdown scrollbar ───────────────────────────────────────────────── */
+  .algo-dropdown-menu::-webkit-scrollbar        { width: 4px; }
+  .algo-dropdown-menu::-webkit-scrollbar-track  { background: transparent; }
+  .algo-dropdown-menu::-webkit-scrollbar-thumb  {
+    background: rgba(97, 119, 169, 0.35);
+    border-radius: 2px;
+  }
+  .algo-dropdown-menu::-webkit-scrollbar-thumb:hover { background: rgba(97, 119, 169, 0.6); }
+  .algo-dropdown-menu { scrollbar-width: thin; scrollbar-color: rgba(97,119,169,0.35) transparent; }
+
   input[type="number"] {
     -moz-appearance: textfield;
   }

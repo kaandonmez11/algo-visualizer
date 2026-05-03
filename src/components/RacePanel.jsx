@@ -18,6 +18,17 @@ const WIKI_URLS = {
   'Comb Sort':            'https://en.wikipedia.org/wiki/Comb_sort',
   'Odd-Even Sort':        'https://en.wikipedia.org/wiki/Odd%E2%80%93even_sort',
   'Bogo Sort':            'https://en.wikipedia.org/wiki/Bogosort',
+  'Tim Sort':             'https://en.wikipedia.org/wiki/Timsort',
+  'Intro Sort':           'https://en.wikipedia.org/wiki/Introsort',
+  'Counting Sort':        'https://en.wikipedia.org/wiki/Counting_sort',
+  'Bucket Sort':          'https://en.wikipedia.org/wiki/Bucket_sort',
+  'Pigeonhole Sort':      'https://en.wikipedia.org/wiki/Pigeonhole_sort',
+  'Cycle Sort':           'https://en.wikipedia.org/wiki/Cycle_sort',
+  'Tree Sort':            'https://en.wikipedia.org/wiki/Tree_sort',
+  'Strand Sort':          'https://en.wikipedia.org/wiki/Strand_sort',
+  'Stooge Sort':          'https://en.wikipedia.org/wiki/Stooge_sort',
+  'Sleep Sort':           'https://en.wikipedia.org/wiki/Bogosort#Similar_algorithms',
+  'Stalin Sort':          'https://www.quora.com/What-is-Stalin-sort',
 }
 
 const RacePanel = forwardRef(function RacePanel({ algorithm, initialArray, delay, onFinished }, ref) {

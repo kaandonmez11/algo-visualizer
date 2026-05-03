@@ -44,6 +44,17 @@ const WIKI_URLS = {
   'Comb Sort':            'https://en.wikipedia.org/wiki/Comb_sort',
   'Odd-Even Sort':        'https://en.wikipedia.org/wiki/Odd%E2%80%93even_sort',
   'Bogo Sort':            'https://en.wikipedia.org/wiki/Bogosort',
+  'Tim Sort':             'https://en.wikipedia.org/wiki/Timsort',
+  'Intro Sort':           'https://en.wikipedia.org/wiki/Introsort',
+  'Counting Sort':        'https://en.wikipedia.org/wiki/Counting_sort',
+  'Bucket Sort':          'https://en.wikipedia.org/wiki/Bucket_sort',
+  'Pigeonhole Sort':      'https://en.wikipedia.org/wiki/Pigeonhole_sort',
+  'Cycle Sort':           'https://en.wikipedia.org/wiki/Cycle_sort',
+  'Tree Sort':            'https://en.wikipedia.org/wiki/Tree_sort',
+  'Strand Sort':          'https://en.wikipedia.org/wiki/Strand_sort',
+  'Stooge Sort':          'https://en.wikipedia.org/wiki/Stooge_sort',
+  'Sleep Sort':           'https://en.wikipedia.org/wiki/Bogosort#Similar_algorithms',
+  'Stalin Sort':          'https://www.quora.com/What-is-Stalin-sort',
 }
 
 const ARRAY_TYPES = [
@@ -88,10 +99,10 @@ function StatPill({ label, value, color }) {
 }
 
 export default function App() {
-  const [arraySize,      setArraySize]      = useState(100)
-  const [delay,          setDelay]          = useState(50)
-  const [arraySizeInput, setArraySizeInput] = useState('100')
-  const [delayInput,     setDelayInput]     = useState('50')
+  const [arraySize,      setArraySize]      = useState(50)
+  const [delay,          setDelay]          = useState(5)
+  const [arraySizeInput, setArraySizeInput] = useState('50')
+  const [delayInput,     setDelayInput]     = useState('5')
   const [arrayType,      setArrayType]      = useState('random')
   const [customInput,    setCustomInput]    = useState('')
   const [selectedAlgo,   setSelectedAlgo]   = useState(ALGORITHMS[0])
@@ -103,7 +114,7 @@ export default function App() {
   const [timelinePos,    setTimelinePos]    = useState(0)
 
   const [mode,       setMode]       = useState('single')
-  const [raceArray,  setRaceArray]  = useState(() => makeRandom(100))
+  const [raceArray,  setRaceArray]  = useState(() => makeRandom(50))
   const [slideClass, setSlideClass] = useState('')
 
   const raceGridRef = useRef(null)

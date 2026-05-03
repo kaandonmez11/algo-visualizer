@@ -1,24 +1,16 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown } from 'lucide-react'
 
-export const ALGORITHMS = [
-  'Bubble Sort',
-  'Selection Sort',
-  'Insertion Sort',
-  'Merge Sort',
-  'Quick Sort',
-  'Heap Sort',
-  'Radix Sort',
-  'Shell Sort',
-  'Cocktail Shaker Sort',
-  'Gnome Sort',
-  'Bitonic Sort',
-  'Pancake Sort',
-  'Comb Sort',
-  'Odd-Even Sort',
-  'Bogo Sort',
+const ALGO_GROUPS = [
+  { label: 'En Hızlılar',  algos: ['Counting Sort', 'Pigeonhole Sort', 'Bucket Sort', 'Radix Sort'] },
+  { label: 'Verimli',      algos: ['Tim Sort', 'Intro Sort', 'Merge Sort', 'Quick Sort', 'Heap Sort', 'Shell Sort'] },
+  { label: 'Temel',        algos: ['Bubble Sort', 'Selection Sort', 'Insertion Sort'] },
+  { label: 'Egzotik',      algos: ['Cocktail Shaker Sort', 'Gnome Sort', 'Comb Sort', 'Odd-Even Sort', 'Cycle Sort', 'Bitonic Sort', 'Strand Sort', 'Pancake Sort', 'Tree Sort'] },
+  { label: 'Komik',        algos: ['Bogo Sort', 'Stooge Sort', 'Sleep Sort', 'Stalin Sort'] },
 ]
+
+export const ALGORITHMS = ALGO_GROUPS.flatMap(g => g.algos)
 
 export default function AlgoDropdown({ value, onChange, disabled = false, compact = false }) {
   const [open, setOpen] = useState(false)
@@ -63,17 +55,24 @@ export default function AlgoDropdown({ value, onChange, disabled = false, compac
 
       {open && createPortal(
         <ul ref={menuRef}
-          style={{ position: 'fixed', top: pos.top, left: pos.left, minWidth: pos.width, zIndex: 9999 }}
-          className="bg-[#0f0f1a] border border-white/10 rounded-lg shadow-xl shadow-black/50 overflow-hidden py-1">
-          {ALGORITHMS.map(algo => (
-            <li key={algo} onClick={() => { onChange(algo); setOpen(false) }}
-              className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer transition-colors duration-150
-                ${value === algo
-                  ? 'bg-[#6177a9]/20 text-[#8fa3c8]'
-                  : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
-              <span className={`w-3 text-[#f8c23c] text-xs ${value === algo ? 'opacity-100' : 'opacity-0'}`}>✓</span>
-              {algo}
-            </li>
+          style={{ position: 'fixed', top: pos.top, left: pos.left, minWidth: pos.width, zIndex: 9999, maxHeight: '70vh' }}
+          className="algo-dropdown-menu bg-[#0f0f1a] border border-white/10 rounded-lg shadow-xl shadow-black/50 overflow-y-auto py-1">
+          {ALGO_GROUPS.map((group, gi) => (
+            <Fragment key={group.label}>
+              <li className={`px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 select-none pointer-events-none ${gi === 0 ? 'pt-2' : 'pt-3'}`}>
+                {group.label}
+              </li>
+              {group.algos.map(algo => (
+                <li key={algo} onClick={() => { onChange(algo); setOpen(false) }}
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer transition-colors duration-150
+                    ${value === algo
+                      ? 'bg-[#6177a9]/20 text-[#8fa3c8]'
+                      : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
+                  <span className={`w-3 text-[#f8c23c] text-xs shrink-0 ${value === algo ? 'opacity-100' : 'opacity-0'}`}>✓</span>
+                  {algo}
+                </li>
+              ))}
+            </Fragment>
           ))}
         </ul>,
         document.body

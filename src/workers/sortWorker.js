@@ -212,8 +212,17 @@ const GENS = {
 }
 
 // ── Worker entry ──────────────────────────────────────────────────────────────
+let _paused  = false
+let _resume  = null   // saved tick fn, called on resume
+
 self.onmessage = function (e) {
-  const { array, delay, algorithm = 'Bubble Sort' } = e.data
+  // Pause / resume control messages
+  if (e.data?.type === 'pause')  { _paused = true;  return }
+  if (e.data?.type === 'resume') { _paused = false; _resume?.(); _resume = null; return }
+
+  const { array, delay, algorithm = 'Bubble Sort', fastForwardSwaps = 0 } = e.data
+  _paused = false
+  _resume = null
 
   const cpuArr = [...array]
   const t0 = performance.now()
@@ -229,7 +238,23 @@ self.onmessage = function (e) {
   const gen = (GENS[algorithm] ?? bubbleSortGen)(animArr)
   let lastCmp = 0, lastAcc = 0
 
+  // Synchronous fast-forward: tight loop, no postMessage, no setTimeout overhead
+  if (fastForwardSwaps > 0) {
+    let ffSwaps = 0
+    while (ffSwaps < fastForwardSwaps) {
+      const { value, done } = gen.next()
+      if (done) {
+        self.postMessage({ type: 'done', array: animArr, cpuTime, cmp: lastCmp, acc: lastAcc })
+        return
+      }
+      if (value.cmp !== undefined) lastCmp = value.cmp
+      if (value.acc !== undefined) lastAcc = value.acc
+      if (value.type === 'swap') ffSwaps++
+    }
+  }
+
   function tick() {
+    if (_paused) { _resume = tick; return }
     const { value, done } = gen.next()
     if (done) {
       self.postMessage({ type: 'done', array: animArr, cpuTime, cmp: lastCmp, acc: lastAcc })

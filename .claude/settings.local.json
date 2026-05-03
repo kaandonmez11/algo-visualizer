@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \"LISTEN\")",
+      "Bash(findstr \"518\")",
+      "Bash(findstr \":51\")",
+      "Bash(findstr \"LISTENING\")"
     ]
   }
 }

@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown } from 'lucide-react'
+import { useLanguage, T } from '../i18n/LanguageContext'
 
 const ALGO_GROUPS = [
-  { label: 'En Hızlılar',  algos: ['Counting Sort', 'Pigeonhole Sort', 'Bucket Sort', 'Radix Sort'] },
-  { label: 'Verimli',      algos: ['Tim Sort', 'Intro Sort', 'Merge Sort', 'Quick Sort', 'Heap Sort', 'Shell Sort'] },
-  { label: 'Temel',        algos: ['Bubble Sort', 'Selection Sort', 'Insertion Sort'] },
-  { label: 'Egzotik',      algos: ['Cocktail Shaker Sort', 'Gnome Sort', 'Comb Sort', 'Odd-Even Sort', 'Cycle Sort', 'Bitonic Sort', 'Strand Sort', 'Pancake Sort', 'Tree Sort'] },
-  { label: 'Komik',        algos: ['Bogo Sort', 'Stooge Sort', 'Sleep Sort', 'Stalin Sort'] },
+  { labelKey: 'groupFastest',   algos: ['Counting Sort', 'Pigeonhole Sort', 'Bucket Sort', 'Radix Sort'] },
+  { labelKey: 'groupEfficient', algos: ['Tim Sort', 'Intro Sort', 'Merge Sort', 'Quick Sort', 'Heap Sort', 'Shell Sort'] },
+  { labelKey: 'groupClassic',   algos: ['Bubble Sort', 'Selection Sort', 'Insertion Sort'] },
+  { labelKey: 'groupExotic',    algos: ['Cocktail Shaker Sort', 'Gnome Sort', 'Comb Sort', 'Odd-Even Sort', 'Cycle Sort', 'Bitonic Sort', 'Strand Sort', 'Pancake Sort', 'Tree Sort'] },
+  { labelKey: 'groupJoke',      algos: ['Bogo Sort', 'Stooge Sort', 'Sleep Sort', 'Stalin Sort'] },
 ]
 
 export const ALGORITHMS = ALGO_GROUPS.flatMap(g => g.algos)
@@ -58,9 +59,9 @@ export default function AlgoDropdown({ value, onChange, disabled = false, compac
           style={{ position: 'fixed', top: pos.top, left: pos.left, minWidth: pos.width, zIndex: 9999, maxHeight: '70vh' }}
           className="algo-dropdown-menu bg-[#0f0f1a] border border-white/10 rounded-lg shadow-xl shadow-black/50 overflow-y-auto py-1">
           {ALGO_GROUPS.map((group, gi) => (
-            <Fragment key={group.label}>
+            <Fragment key={group.labelKey}>
               <li className={`px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 select-none pointer-events-none ${gi === 0 ? 'pt-2' : 'pt-3'}`}>
-                {group.label}
+                <T k={group.labelKey} />
               </li>
               {group.algos.map(algo => (
                 <li key={algo} onClick={() => { onChange(algo); setOpen(false) }}

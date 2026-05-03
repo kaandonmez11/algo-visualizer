@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { Play, Square, RotateCcw, Volume2, VolumeX, Shuffle, Swords, GitCommitHorizontal } from 'lucide-react'
+import { Play, Square, RotateCcw, Volume2, VolumeX, Shuffle, Swords, GitCommitHorizontal, Languages } from 'lucide-react'
 import CanvasRenderer from './components/CanvasRenderer'
 import RaceGrid from './components/RaceGrid'
 import AlgoDropdown, { ALGORITHMS } from './components/AlgoDropdown'
 import { audioManager } from './utils/audioManager'
+import { useLanguage, T } from './i18n/LanguageContext'
 
 // ── Array generation ──────────────────────────────────────────────────────────
 function makeRandom(n)   { return Array.from({ length: n }, () => Math.floor(Math.random() * n) + 1) }
@@ -57,11 +58,7 @@ const WIKI_URLS = {
   'Stalin Sort':          'https://www.quora.com/What-is-Stalin-sort',
 }
 
-const ARRAY_TYPES = [
-  { value: 'random',   label: 'Rastgele' },
-  { value: 'reversed', label: 'Ters Sıralı' },
-  { value: 'nearly',   label: 'Neredeyse Sıralı' },
-]
+const ARRAY_TYPE_KEYS = ['random', 'reversed', 'nearly']
 
 function SliderWithInput({ label, sliderValue, onSliderChange, inputValue, onInputChange, onCommit, sliderMin, sliderMax, unit = '' }) {
   return (
@@ -99,6 +96,7 @@ function StatPill({ label, value, color }) {
 }
 
 export default function App() {
+  const { t, lang, setLang } = useLanguage()
   const [arraySize,      setArraySize]      = useState(50)
   const [delay,          setDelay]          = useState(5)
   const [arraySizeInput, setArraySizeInput] = useState('50')
@@ -370,29 +368,51 @@ export default function App() {
           Algo <span className="text-[#47b8ad]">Visualizer</span>
         </h1>
 
-        {/* Mode toggle */}
-        <div className="relative ml-auto flex items-center p-[3px] rounded-lg bg-white/5 border border-white/10">
-          <div
-            className="absolute inset-[3px] rounded-[7px] pointer-events-none transition-all duration-300"
-            style={{
-              width: 'calc(50% - 1.5px)',
-              transform: mode === 'race' ? 'translateX(calc(100% + 3px))' : 'translateX(0)',
-              background: mode === 'single' ? 'rgba(97,119,169,0.3)' : 'rgba(248,194,60,0.18)',
-              border:     mode === 'single' ? '1px solid rgba(97,119,169,0.4)' : '1px solid rgba(248,194,60,0.3)',
-            }}
-          />
-          <button onClick={() => switchMode('single')}
-            className={`relative z-10 h-7 min-w-[7.5rem] rounded-md text-xs font-medium
-              transition-colors duration-300
-              ${mode === 'single' ? 'text-[#8fa3c8]' : 'text-slate-500 hover:text-slate-300'}`}>
-            Tek Algoritma
-          </button>
-          <button onClick={() => switchMode('race')}
-            className={`relative z-10 h-7 min-w-[7.5rem] rounded-md text-xs font-medium
-              flex items-center justify-center gap-1.5 transition-colors duration-300
-              ${mode === 'race' ? 'text-[#f8c23c]' : 'text-slate-500 hover:text-slate-300'}`}>
-            <Swords size={11} /> Karşılaştırma
-          </button>
+        {/* Mode toggle + language switcher */}
+        <div className="ml-auto flex items-center gap-2">
+          <div className="relative flex items-center p-[3px] rounded-lg bg-white/5 border border-white/10">
+            <div
+              className="absolute inset-[3px] rounded-[7px] pointer-events-none transition-all duration-300"
+              style={{
+                width: 'calc(50% - 1.5px)',
+                transform: mode === 'race' ? 'translateX(calc(100% + 3px))' : 'translateX(0)',
+                background: mode === 'single' ? 'rgba(97,119,169,0.3)' : 'rgba(248,194,60,0.18)',
+                border:     mode === 'single' ? '1px solid rgba(97,119,169,0.4)' : '1px solid rgba(248,194,60,0.3)',
+              }}
+            />
+            <button onClick={() => switchMode('single')}
+              className={`relative z-10 h-7 min-w-[7.5rem] rounded-md text-xs font-medium
+                transition-colors duration-300
+                ${mode === 'single' ? 'text-[#8fa3c8]' : 'text-slate-500 hover:text-slate-300'}`}>
+              <T k="singleMode" />
+            </button>
+            <button onClick={() => switchMode('race')}
+              className={`relative z-10 h-7 min-w-[7.5rem] rounded-md text-xs font-medium
+                flex items-center justify-center gap-1.5 transition-colors duration-300
+                ${mode === 'race' ? 'text-[#f8c23c]' : 'text-slate-500 hover:text-slate-300'}`}>
+              <Swords size={11} /> <T k="raceMode" />
+            </button>
+          </div>
+
+          {/* Language toggle */}
+          <div className="relative flex items-center p-[3px] rounded-lg bg-white/5 border border-white/10">
+            <div
+              className="absolute inset-[3px] rounded-[7px] pointer-events-none transition-all duration-300"
+              style={{
+                width: 'calc(50% - 1.5px)',
+                transform: lang === 'tr' ? 'translateX(calc(100% + 3px))' : 'translateX(0)',
+                background: 'rgba(97,119,169,0.3)',
+                border: '1px solid rgba(97,119,169,0.4)',
+              }}
+            />
+            {['en', 'tr'].map(l => (
+              <button key={l} onClick={() => setLang(l)}
+                className={`relative z-10 h-7 w-9 rounded-md text-xs font-semibold transition-colors duration-300
+                  ${lang === l ? 'text-[#8fa3c8]' : 'text-slate-500 hover:text-slate-300'}`}>
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -400,7 +420,7 @@ export default function App() {
       <div className="flex flex-wrap items-end gap-5 px-6 py-4 border-b border-white/10 bg-white/[0.03] backdrop-blur-sm">
 
         <SliderWithInput
-          label="Dizi Boyutu"
+          label={<T k="arraySize" />}
           sliderMin={10} sliderMax={500}
           sliderValue={arraySize}
           onSliderChange={v => { setArraySize(v); setArraySizeInput(String(v)) }}
@@ -410,27 +430,27 @@ export default function App() {
         />
 
         <SliderWithInput
-          label="Gecikme"
+          label={<T k="delay" />}
           sliderMin={0} sliderMax={500}
           sliderValue={delay}
           onSliderChange={v => { setDelay(v); setDelayInput(String(v)) }}
           inputValue={delayInput}
           onInputChange={setDelayInput}
           onCommit={commitDelay}
-          unit="ms"
+          unit={<T k="unit_ms" />}
         />
 
         {/* Array Type */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-slate-400">Dizi Tipi</label>
+          <label className="text-xs font-medium text-slate-400"><T k="arrayType" /></label>
           <div className="flex gap-1.5">
-            {ARRAY_TYPES.map(type => (
-              <button key={type.value} onClick={() => setArrayType(type.value)}
+            {ARRAY_TYPE_KEYS.map(key => (
+              <button key={key} onClick={() => setArrayType(key === 'nearly' ? 'nearly' : key)}
                 className={`h-9 px-3 rounded-lg text-xs font-medium border transition-all duration-200
-                  ${arrayType === type.value
+                  ${arrayType === (key === 'nearly' ? 'nearly' : key)
                     ? 'bg-[#f8c23c]/15 border-[#f8c23c]/50 text-[#f8c23c] shadow-sm shadow-[#f8c23c]/10'
                     : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-slate-200'}`}>
-                {type.label}
+                <T k={key === 'nearly' ? 'nearlySorted' : key} />
               </button>
             ))}
           </div>
@@ -438,9 +458,9 @@ export default function App() {
 
         {/* Custom Input */}
         <div className="flex flex-col gap-1.5 flex-1 min-w-[200px]">
-          <label className="text-xs font-medium text-slate-400">Özel Dizi</label>
+          <label className="text-xs font-medium text-slate-400"><T k="customArray" /></label>
           <input type="text" value={customInput} onChange={e => setCustomInput(e.target.value)}
-            placeholder="Virgülle ayır: 5, 3, 8, 1..."
+            placeholder={t('customPlaceholder')}
             className="h-9 px-3 rounded-lg text-sm bg-white/5 border border-white/10 text-slate-200
               placeholder:text-slate-600 outline-none transition-all duration-200
               focus:border-[#6177a9]/60 focus:ring-1 focus:ring-[#6177a9]/20" />
@@ -449,14 +469,14 @@ export default function App() {
         {/* Algorithm — single mode only */}
         {mode === 'single' && (
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-slate-400">Algoritma</label>
+            <label className="text-xs font-medium text-slate-400"><T k="algorithm" /></label>
             <AlgoDropdown value={selectedAlgo} onChange={setSelectedAlgo} disabled={isRunning || isPaused} />
           </div>
         )}
 
         {/* Action Buttons */}
         <div className="flex items-end gap-2 ml-auto">
-          <button onClick={() => setIsMuted(m => !m)} title={isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
+          <button onClick={() => setIsMuted(m => !m)} title={isMuted ? t('unmute') : t('mute')}
             className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/10 bg-white/5
               text-slate-400 hover:bg-white/10 hover:text-[#47b8ad] transition-all duration-200">
             {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -466,7 +486,7 @@ export default function App() {
             className="h-9 flex items-center gap-2 px-4 rounded-lg border border-white/10 bg-white/5
               text-slate-300 text-sm font-medium hover:bg-white/10 hover:text-[#47b8ad]
               hover:border-[#47b8ad]/30 transition-all duration-200 active:scale-95">
-            <Shuffle size={14} /> Oluştur
+            <Shuffle size={14} /> <T k="generate" />
           </button>
 
           {/* Single mode controls — mirrors race mode UX */}
@@ -475,7 +495,7 @@ export default function App() {
               className="h-9 flex items-center gap-2 px-4 rounded-lg text-sm font-semibold
                 transition-all duration-200 active:scale-95 shadow-lg
                 bg-[#ed6b69]/20 hover:bg-[#ed6b69]/30 border border-[#ed6b69]/50 text-[#f29190] shadow-[#ed6b69]/10">
-              <Square size={14} /> Duraklat
+              <Square size={14} /> <T k="pause" />
             </button>
           )}
           {mode === 'single' && isPaused && (
@@ -484,13 +504,13 @@ export default function App() {
                 className="h-9 flex items-center gap-2 px-4 rounded-lg text-sm font-semibold
                   transition-all duration-200 active:scale-95
                   bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-slate-200">
-                <RotateCcw size={13} /> Yeniden Başlat
+                <RotateCcw size={13} /> <T k="restart" />
               </button>
               <button onClick={handleResume}
                 className="h-9 flex items-center gap-2 px-4 rounded-lg text-sm font-semibold
                   transition-all duration-200 active:scale-95 shadow-lg
                   bg-[#47b8ad]/20 hover:bg-[#47b8ad]/30 border border-[#47b8ad]/50 text-[#72cec5] shadow-[#47b8ad]/10">
-                <Play size={14} /> Devam Et
+                <Play size={14} /> <T k="resume" />
               </button>
             </>
           )}
@@ -499,7 +519,7 @@ export default function App() {
               className="h-9 flex items-center gap-2 px-4 rounded-lg text-sm font-semibold
                 transition-all duration-200 active:scale-95 shadow-lg
                 bg-[#6177a9]/20 hover:bg-[#6177a9]/30 border border-[#6177a9]/50 text-[#8fa3c8] shadow-[#6177a9]/10">
-              <Play size={14} /> {isDone ? 'Yeniden Başlat' : 'Başlat'}
+              <Play size={14} /> {isDone ? <T k="restartStart" /> : <T k="start" />}
             </button>
           )}
         </div>
@@ -523,7 +543,7 @@ export default function App() {
                     <div key={i} className="w-3 rounded-sm bg-[#6177a9]/25" style={{ height: `${h}%` }} />
                   ))}
                 </div>
-                <p className="text-slate-600 text-sm font-medium mt-1">Oluştur'a bas veya Başlat'a tıkla</p>
+                <p className="text-slate-600 text-sm font-medium mt-1"><T k="generatePrompt" /></p>
               </div>
             )}
             {isReady && (
@@ -534,7 +554,7 @@ export default function App() {
                   {selectedAlgo}
                 </a>
                 {isRunning  && <span className="w-1.5 h-1.5 rounded-full bg-[#f8c23c] animate-pulse" />}
-                {isDone     && <span className="text-xs text-[#47b8ad] font-medium">Tamamlandı</span>}
+                {isDone     && <span className="text-xs text-[#47b8ad] font-medium"><T k="done" /></span>}
                 {isPaused   && <span className="text-xs text-[#ed6b69]/80 font-medium">⏸</span>}
               </div>
             )}
@@ -542,14 +562,14 @@ export default function App() {
 
           {/* Stats bar */}
           <div className="flex items-center gap-5 px-1 shrink-0">
-            <StatPill label="Karşılaştırma" value={stats?.cmp?.toLocaleString()}                                      color="text-[#f8c23c]" />
-            <StatPill label="Dizi Erişimi"  value={stats?.acc?.toLocaleString()}                                      color="text-[#ed6b69]" />
-            <StatPill label="Saf CPU"       value={stats?.cpuTime != null ? `${stats.cpuTime.toFixed(3)} ms` : null}  color="text-[#47b8ad]" />
-            <StatPill label="Süre"          value={stats?.animTime != null ? `${stats.animTime} s` : null}            color="text-[#8fa3c8]" />
+            <StatPill label={<T k="comparisons" />}  value={stats?.cmp?.toLocaleString()}                                      color="text-[#f8c23c]" />
+            <StatPill label={<T k="arrayAccesses" />} value={stats?.acc?.toLocaleString()}                                      color="text-[#ed6b69]" />
+            <StatPill label={<T k="cpuTime" />}       value={stats?.cpuTime != null ? `${stats.cpuTime.toFixed(3)} ms` : null}  color="text-[#47b8ad]" />
+            <StatPill label={<T k="elapsed" />}       value={stats?.animTime != null ? `${stats.animTime} s` : null}            color="text-[#8fa3c8]" />
             <div className="ml-auto flex items-center gap-3 text-xs text-slate-700">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#f8c23c]/60" /> Karşılaştırılan</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#ed6b69]/60" /> Değiştirilen</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#47b8ad]/60" /> Sıralanan</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#f8c23c]/60" /> <T k="comparing" /></span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#ed6b69]/60" /> <T k="swapping" /></span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#47b8ad]/60" /> <T k="sorted" /></span>
             </div>
           </div>
 

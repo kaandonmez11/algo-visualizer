@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHand
 import { Play, Square, RotateCcw, GitCommitHorizontal } from 'lucide-react'
 import RacePanel from './RacePanel'
 import AlgoDropdown, { ALGORITHMS } from './AlgoDropdown'
+import { useLanguage, T } from '../i18n/LanguageContext'
 
 const DEFAULT_ALGOS = ['Bubble Sort', 'Quick Sort', 'Merge Sort', 'Heap Sort']
 
@@ -14,6 +15,7 @@ const GRID_CLS = {
 }
 
 const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
+  const { t } = useLanguage()
   const [count,       setCount]       = useState(2)
   const [algos,       setAlgos]       = useState(DEFAULT_ALGOS)
   const [status,      setStatus]      = useState('idle')   // idle | running | paused | done
@@ -142,7 +144,7 @@ const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
 
         {/* Count selector */}
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-slate-500 shrink-0">Algoritma Sayısı:</span>
+          <span className="text-xs text-slate-500 shrink-0"><T k="algorithmCount" /></span>
           {[2, 3, 4].map(n => (
             <button key={n} onClick={() => changeCount(n)}
               className={`w-7 h-7 rounded-md text-xs font-semibold border transition-all duration-150
@@ -176,7 +178,7 @@ const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
               className="h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold border
                 bg-[#ed6b69]/20 border-[#ed6b69]/50 text-[#f29190]
                 hover:bg-[#ed6b69]/30 active:scale-95 transition-all duration-200">
-              <Square size={11} /> Durdur
+              <Square size={11} /> <T k="stop" />
             </button>
           )}
           {(isPaused || isDone) && (
@@ -184,7 +186,7 @@ const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
               className="h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold border
                 bg-white/5 border-white/10 text-slate-400
                 hover:bg-white/10 hover:text-slate-200 active:scale-95 transition-all duration-200">
-              <RotateCcw size={11} /> Baştan Başla
+              <RotateCcw size={11} /> <T k="restart" />
             </button>
           )}
           {isPaused && (
@@ -192,7 +194,7 @@ const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
               className="h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold border
                 bg-[#47b8ad]/20 border-[#47b8ad]/50 text-[#72cec5]
                 hover:bg-[#47b8ad]/30 active:scale-95 transition-all duration-200">
-              <Play size={11} /> Devam Et
+              <Play size={11} /> <T k="resume" />
             </button>
           )}
           {(isIdle || isDone) && (
@@ -200,7 +202,7 @@ const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
               className="h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold border
                 bg-[#6177a9]/20 border-[#6177a9]/50 text-[#8fa3c8]
                 hover:bg-[#6177a9]/30 active:scale-95 transition-all duration-200">
-              <Play size={11} /> {isDone ? 'Yeniden Başlat' : 'Yarışı Başlat'}
+              <Play size={11} /> {isDone ? <T k="restartRace" /> : <T k="startRace" />}
             </button>
           )}
         </div>
@@ -222,9 +224,9 @@ const RaceGrid = forwardRef(function RaceGrid({ initialArray, delay }, ref) {
 
       {/* ── Color legend ──────────────────────────────────────────────── */}
       <div className="shrink-0 flex items-center gap-4 px-1">
-        <span className="flex items-center gap-1 text-xs text-slate-700"><span className="w-2 h-2 rounded-sm bg-[#f8c23c]/60" /> Karşılaştırılan</span>
-        <span className="flex items-center gap-1 text-xs text-slate-700"><span className="w-2 h-2 rounded-sm bg-[#ed6b69]/60" /> Değiştirilen</span>
-        <span className="flex items-center gap-1 text-xs text-slate-700"><span className="w-2 h-2 rounded-sm bg-[#47b8ad]/60" /> Sıralanan</span>
+        <span className="flex items-center gap-1 text-xs text-slate-700"><span className="w-2 h-2 rounded-sm bg-[#f8c23c]/60" /> <T k="comparing" /></span>
+        <span className="flex items-center gap-1 text-xs text-slate-700"><span className="w-2 h-2 rounded-sm bg-[#ed6b69]/60" /> <T k="swapping" /></span>
+        <span className="flex items-center gap-1 text-xs text-slate-700"><span className="w-2 h-2 rounded-sm bg-[#47b8ad]/60" /> <T k="sorted" /></span>
       </div>
 
       {/* ── Timeline — always visible at bottom ───────────────────────── */}

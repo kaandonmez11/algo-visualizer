@@ -1,6 +1,7 @@
 import { useRef, useState, useImperativeHandle, forwardRef, useEffect } from 'react'
 import CanvasRenderer from './CanvasRenderer'
 import { audioManager } from '../utils/audioManager'
+import { useLanguage, T } from '../i18n/LanguageContext'
 
 const WIKI_URLS = {
   'Bubble Sort':          'https://en.wikipedia.org/wiki/Bubble_sort',
@@ -57,6 +58,7 @@ const RacePanel = forwardRef(function RacePanel({ algorithm, initialArray, delay
     workerRef.current?.terminate()
     clearInterval(statsTimerRef.current)
   }, [])
+
 
   const [stats,  setStats]  = useState(null)
   const [status, setStatus] = useState('idle')
@@ -238,18 +240,18 @@ const RacePanel = forwardRef(function RacePanel({ algorithm, initialArray, delay
             {algorithm}
           </a>
           {status === 'running' && <span className="w-1.5 h-1.5 rounded-full bg-[#f8c23c] animate-pulse" />}
-          {status === 'done'    && <span className="text-xs text-[#47b8ad] font-semibold">✓ Bitti</span>}
+          {status === 'done'    && <span className="text-xs text-[#47b8ad] font-semibold">✓ <T k="done" /></span>}
           {status === 'paused'  && <span className="text-xs text-[#ed6b69]/80 font-medium">⏸</span>}
         </div>
       </div>
 
       <div className="flex items-center gap-3 px-0.5 flex-wrap min-h-[18px]">
-        <PanelStat label="Karşılaştırma" value={stats?.cmp?.toLocaleString()}  color="text-[#f8c23c]" />
-        <PanelStat label="Dizi Erişimi"  value={stats?.acc?.toLocaleString()}  color="text-[#ed6b69]" />
-        <PanelStat label="Saf CPU"
+        <PanelStat label={<T k="comparisons" />}  value={stats?.cmp?.toLocaleString()}  color="text-[#f8c23c]" />
+        <PanelStat label={<T k="arrayAccesses" />} value={stats?.acc?.toLocaleString()}  color="text-[#ed6b69]" />
+        <PanelStat label={<T k="cpuTime" />}
           value={stats?.cpuTime != null ? `${stats.cpuTime.toFixed(3)} ms` : null}
           color="text-[#47b8ad]" />
-        <PanelStat label="Süre"
+        <PanelStat label={<T k="elapsed" />}
           value={stats?.animTime != null ? `${stats.animTime} s` : null}
           color="text-[#8fa3c8]" />
       </div>
